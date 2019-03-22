@@ -7,6 +7,7 @@ import os
 import sys
 from PIL import Image
 import datetime
+import math
 
 sleep = 0.2
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -27,6 +28,16 @@ images = []
 for phi in [-pi/12, 0, pi/12]:
     for theta in [-pi/12, 0, pi/12]:
         for r in [5, 5.5, 6]:
+            camera_x = r*math.sin(theta)*math.cos(phi)
+            camera_y = r*math.sin(theta)*math.sin(phi)
+            camera_z = r*math.cos(theta)
+            
+            colors = []
+            for p in xyz:
+               distance = math.sqrt((camera_x-p[0])**2 + (camera_y-p[1])**2 + (camera_z-p[2])**2)
+               colors.append(distance)
+            v.attributes(colors)
+            
             v.set(lookat = [x_center, y_center, z_center],
                   phi = phi,
                   theta = theta,
