@@ -2,6 +2,7 @@ import cv2
 
 img = cv2.imread('20190324232701.png')
 full_width, full_height = img.shape[:2]
+print full_width, full_height 
 
 for line in open('20190324232701.txt'):
 	obj, x_center, y_center, width, height = map(float, line.split(" "))
