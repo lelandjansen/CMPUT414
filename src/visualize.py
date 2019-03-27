@@ -9,6 +9,7 @@ import sys
 from PIL import Image
 import datetime
 import math
+from multiprocessing import Pool
 
 SLEEP = 0.2
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -22,7 +23,7 @@ def enumerate_files():
     return (vehicles, pedestrians)
 
 
-def generate_perspectives(f):
+def generate_perspectives(f, style):
     path = os.path.join(DIR_PATH, '../data/sydney-urban-objects-dataset/objects/', f)
     xyz = np.loadtxt(open(path, 'rb'), delimiter=',', usecols=range(3,6))
     x_min, y_min, z_min = xyz.min(axis=0)
@@ -38,6 +39,9 @@ def generate_perspectives(f):
     for phi in np.arange(0.0, pi, pi / 8.0):
         for theta in np.arange(0.0, 2 * pi, pi / 4.0):
             r = 7.5
+            if style != 'plain':
+                print 'unknown style'
+                return
             # camera_x = r * math.sin(phi) * math.cos(theta)
             # camera_y = r * math.sin(phi) * math.sin(theta)
             # camera_z = r * math.cos(phi)
@@ -65,7 +69,7 @@ def generate_perspectives(f):
     return images
 
 
-def join_perspectives(images):
+def join_perspectives(f, images, style):
     images = map(Image.open, images) 
     widths, heights = zip(*(image.size for image in images))
     total_width = sum(widths)
@@ -81,8 +85,8 @@ def join_perspectives(images):
             new_image.paste(image, (x_offset, y_offset))
             x_offset += offset
         y_offset += offset
-    path = os.path.join(DIR_PATH, '../out/',
-            '{}.png'.format(datetime.datetime.now().strftime("%Y%m%d%H%M%S")))
+    pre, _ = os.path.splitext(f)
+    path = os.path.join(DIR_PATH, '../out/', '{}.{}.png'.format(style, pre))
     new_image.thumbnail((new_image.size[0] / 3, new_image.size[1] / 3), Image.ANTIALIAS)
     new_image.save(path)
     return path
@@ -92,27 +96,28 @@ def make_label(f, object_class):
     image = Image.open(f) 
     pre, _ = os.path.splitext(f)
     f = pre + '.txt'
+    print f
+    return
     with open(f, 'a') as out:
         for x in np.arange(0.0, image.width, image.width / 8.0):
             for y in np.arange(0.0, image.height, image.height / 8.0):
                 out.write(
                     '{} {} {} {} {}\n'.format(
                         object_class,
-                        x + image.width / 8.0 / 2.0,
-                        y + image.height / 8.0 / 2.0,
-                        image.width / 8.0,
-                        image.height / 8.0))
+                        (x + image.width / 8.0 / 2.0) / image.width,
+                        (y + image.height / 8.0 / 2.0) / image.height,
+                        (image.width / 8.0) / image.width,
+                        (image.height / 8.0) / image.height))
     return f
 
 
 def main():
     vehicles, pedestrians = enumerate_files()
+    style = 'plain'
     for vehicle in vehicles:
-        perspectives = generate_perspectives(vehicle)
-        f = join_perspectives(perspectives)
+        perspectives = generate_perspectives(vehicle, style)
+        f = join_perspectives(vehicle, perspectives, style)
         f = make_label(f, 0)
-        print f
-        return
 
 
 if __name__ == '__main__':
