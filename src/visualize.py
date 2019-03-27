@@ -42,6 +42,11 @@ def generate_perspectives(f, style):
             if style != 'plain':
                 print 'unknown style'
                 return
+            x_min, y_min, z_min = xyz.min(axis=0)
+            x_max, y_max, z_max = xyz.max(axis=0)
+            x_center = (x_min + x_max) / 2.0
+            y_center = (y_min + y_max) / 2.0
+            z_center = (z_min + z_max) / 2.0
             # camera_x = r * math.sin(phi) * math.cos(theta)
             # camera_y = r * math.sin(phi) * math.sin(theta)
             # camera_z = r * math.cos(phi)
@@ -51,7 +56,8 @@ def generate_perspectives(f, style):
             #     colors.append(distance)
             # v.attributes(colors)
             # v.color_map('cool')
-            v.set(phi = phi,
+            v.set(lookat = [x_center, y_center, z_center],
+                  phi = phi,
                   theta = theta,
                   r = r,
                   point_size = 0.02,
