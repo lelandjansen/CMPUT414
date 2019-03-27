@@ -13,152 +13,6 @@ from multiprocessing import Pool
 
 SLEEP = 0.2
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
-DONE = '''
-.
-..
-old
-plain.4wd.0.2299.png
-plain.4wd.0.2299.txt
-plain.4wd.12.3582.png
-plain.4wd.12.3582.txt
-plain.4wd.13.270.png
-plain.4wd.13.270.txt
-plain.4wd.15.5563.png
-plain.4wd.15.5563.txt
-plain.4wd.16.6123.png
-plain.4wd.16.6123.txt
-plain.4wd.17.6783.png
-plain.4wd.17.6783.txt
-plain.4wd.18.7288.png
-plain.4wd.18.7288.txt
-plain.4wd.19.10974.png
-plain.4wd.19.10974.txt
-plain.4wd.2.3582.png
-plain.4wd.2.3582.txt
-plain.4wd.4.17038.png
-plain.4wd.4.17038.txt
-plain.4wd.6.16217.png
-plain.4wd.6.16217.txt
-plain.car.0.5463.png
-plain.car.0.5463.txt
-plain.car.10.6994.png
-plain.car.10.6994.txt
-plain.car.12.16217.png
-plain.car.12.16217.txt
-plain.car.1.5463.png
-plain.car.1.5463.txt
-plain.car.17.16217.png
-plain.car.17.16217.txt
-plain.car.21.16217.png
-plain.car.21.16217.txt
-plain.car.22.17038.png
-plain.car.22.17038.txt
-plain.car.25.17038.png
-plain.car.25.17038.txt
-plain.car.32.5463.png
-plain.car.32.5463.txt
-plain.car.39.16217.png
-plain.car.39.16217.txt
-plain.car.41.17589.png
-plain.car.41.17589.txt
-plain.car.42.17589.png
-plain.car.42.17589.txt
-plain.car.43.17589.png
-plain.car.43.17589.txt
-plain.car.46.8444.png
-plain.car.46.8444.txt
-plain.car.47.17589.png
-plain.car.47.17589.txt
-plain.car.48.17589.png
-plain.car.48.17589.txt
-plain.car.50.17589.png
-plain.car.50.17589.txt
-plain.car.53.23124.png
-plain.car.53.23124.txt
-plain.car.54.23124.png
-plain.car.54.23124.txt
-plain.car.55.23124.png
-plain.car.55.23124.txt
-plain.car.5.5563.png
-plain.car.5.5563.txt
-plain.car.59.23124.png
-plain.car.59.23124.txt
-plain.car.60.25322.png
-plain.car.60.25322.txt
-plain.car.62.2299.png
-plain.car.62.2299.txt
-plain.car.64.8444.png
-plain.car.64.8444.txt
-plain.car.66.4043.png
-plain.car.66.4043.txt
-plain.car.67.270.png
-plain.car.67.270.txt
-plain.car.68.270.png
-plain.car.68.270.txt
-plain.car.70.5100.png
-plain.car.70.5100.txt
-plain.car.71.5229.png
-plain.car.71.5229.txt
-plain.car.76.20631.png
-plain.car.76.20631.txt
-plain.car.78.10974.png
-plain.car.78.10974.txt
-plain.car.80.12346.png
-plain.car.80.12346.txt
-plain.car.83.12346.png
-plain.car.83.12346.txt
-plain.car.9.6994.png
-plain.car.9.6994.txt
-plain.truck.5.270.png
-plain.truck.5.270.txt
-plain.truck.6.5100.png
-plain.truck.6.5100.txt
-plain.truck.7.5100.png
-plain.truck.7.5100.txt
-plain.truck.9.6783.png
-plain.truck.9.6783.txt
-plain.van.10.2738.png
-plain.van.10.2738.txt
-plain.van.12.3725.png
-plain.van.12.3725.txt
-plain.van.14.3983.png
-plain.van.14.3983.txt
-plain.van.16.4093.png
-plain.van.16.4093.txt
-plain.van.1.6994.png
-plain.van.1.6994.txt
-plain.van.17.6994.png
-plain.van.17.6994.txt
-plain.van.19.5100.png
-plain.van.19.5100.txt
-plain.van.2.16217.png
-plain.van.2.16217.txt
-plain.van.24.6123.png
-plain.van.24.6123.txt
-plain.van.25.7288.png
-plain.van.25.7288.txt
-plain.van.26.7288.png
-plain.van.26.7288.txt
-plain.van.27.8254.png
-plain.van.27.8254.txt
-plain.van.28.8254.png
-plain.van.28.8254.txt
-plain.van.30.8444.png
-plain.van.30.8444.txt
-plain.van.31.8444.png
-plain.van.31.8444.txt
-plain.van.32.11204.png
-plain.van.32.11204.txt
-plain.van.4.17589.png
-plain.van.4.17589.txt
-plain.van.7.25322.png
-plain.van.7.25322.txt
-plain.van.8.12119.png
-plain.van.8.12119.txt
-plain.van.9.11886.png
-plain.van.9.11886.txt
-tmp
-'''
 
 def enumerate_files():
     path = os.path.join(DIR_PATH, '../data/sydney-urban-objects-dataset/objects/')
@@ -258,16 +112,11 @@ def make_label(f, object_class):
 def main():
     vehicles, pedestrians = enumerate_files()
     style = 'plain'
-    counter = 0
-    for vehicle in vehicles:
-        counter += 1
-        print counter
-        if os.path.splitext(os.path.basename(vehicle))[0] in DONE:
-            continue
+    for pedestrian in pedestrians:
         os.path.basename("hemanth.txt")
-        perspectives = generate_perspectives(vehicle, style)
-        f = join_perspectives(vehicle, perspectives, style)
-        f = make_label(f, 0)
+        perspectives = generate_perspectives(pedestrian, style)
+        f = join_perspectives(pedestrian, perspectives, style)
+        f = make_label(f, 1)
 
 
 if __name__ == '__main__':
