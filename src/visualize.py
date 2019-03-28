@@ -18,9 +18,17 @@ def enumerate_files():
     path = os.path.join(DIR_PATH, '../data/sydney-urban-objects-dataset/objects/')
     files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
     files  = [f for f in files if f.endswith('.csv')]
-    vehicles = [f for f in files if '4wd' in f or 'car' in f or 'truck' in f or 'van' in f]
+    vehicles = [f for f in files if
+            '4wd' in f or
+            'bus' in f or
+            'car' in f or
+            'trailer' in f or
+            'truck' in f or 
+            'van' in f or
+            'ute' in f]
     pedestrians = [f for f in files if 'pedestrian' in f]
-    return (vehicles, pedestrians)
+    other = [f for f in files if f not in vehicles and f not in pedestrians]
+    return (other, vehicles, pedestrians)
 
 
 def generate_perspectives(f, style):
@@ -103,26 +111,29 @@ def make_label(f, object_class):
     pre, _ = os.path.splitext(f)
     f = pre + '.txt'
     with open(f, 'a') as out:
-        for x in np.arange(0.0, image.width, image.width / 8.0):
-            for y in np.arange(0.0, image.height, image.height / 8.0):
-                out.write(
-                    '{} {} {} {} {}\n'.format(
-                        object_class,
-                        (x + image.width / 8.0 / 2.0) / image.width,
-                        (y + image.height / 8.0 / 2.0) / image.height,
-                        (image.width / 8.0) / image.width,
-                        (image.height / 8.0) / image.height))
+        if object_class == 0:
+            out.write("")
+        else:
+            for x in np.arange(0.0, image.width, image.width / 8.0):
+                for y in np.arange(0.0, image.height, image.height / 8.0):
+                    out.write(
+                        '{} {} {} {} {}\n'.format(
+                            object_class,
+                            (x + image.width / 8.0 / 2.0) / image.width,
+                            (y + image.height / 8.0 / 2.0) / image.height,
+                            (image.width / 8.0) / image.width,
+                            (image.height / 8.0) / image.height))
     return f
 
 
 def main():
-    vehicles, pedestrians = enumerate_files()
+    types = enumerate_files()
     style = 'plain'
-    for pedestrian in pedestrians:
-        os.path.basename("hemanth.txt")
-        perspectives = generate_perspectives(pedestrian, style)
-        f = join_perspectives(pedestrian, perspectives, style)
-        f = make_label(f, 1)
+    for t in range(len(types)):
+        for item in types[t]:
+            perspectives = generate_perspectives(item, style)
+            f = join_perspectives(item, perspectives, style)
+            f = make_label(f, t)
 
 
 if __name__ == '__main__':
