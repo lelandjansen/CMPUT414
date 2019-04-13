@@ -11,7 +11,7 @@ import datetime
 import math
 from multiprocessing import Pool
 
-SLEEP = 0.2
+SLEEP = 0.5
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
 def enumerate_files():
@@ -118,7 +118,7 @@ def make_label(f, object_class):
                 for y in np.arange(0.0, image.height, image.height / 8.0):
                     out.write(
                         '{} {} {} {} {}\n'.format(
-                            object_class,
+                            object_class-1,
                             (x + image.width / 8.0 / 2.0) / image.width,
                             (y + image.height / 8.0 / 2.0) / image.height,
                             (image.width / 8.0) / image.width,
