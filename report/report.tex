@@ -1,0 +1,276 @@
+\documentclass[runningheads,a4paper]{llncs}
+\usepackage{amssymb}
+\setcounter{tocdepth}{3}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{subfig}
+\usepackage{csvsimple}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{url}
+\graphicspath{{./images/}}
+
+\begin{document}
+
+\title{Feature Representation of Point Clouds as 2D Perspective Rasters}
+\author{Leland Jansen \and Nathan Liebrecht}
+\date{April 2019}
+\institute{Deptartment of Computing Science, University of Alberta, Canada}
+
+\maketitle
+
+\begin{abstract}
+As three-dimensional point clouds become an increasingly popular way to
+represent spatial data, with it comes a need to classify objects represented in
+this form. This paper proposes an image feature representation technique which
+classifies 3D point clouds by representing projecting them in a variety of
+perspectives in two-dimensional space, rasterizing these projections, then using
+image classification techniques to classify the rasters. Existing work has had
+limited success using this technique with only one perspective, likely due to
+the considerable information loss during the projection. We hypothesize that
+multiple projections will mitigate these effects by capturing lost data in other
+perspective projections.
+\end{abstract}
+
+\section{Introduction}
+Point clouds are a common, primitive representation of three-dimensional (3D)
+data. Creating these point clouds can be achieved using a variety of
+technologies such as LiDAR imaging systems. As the technology becomes more
+available, a need arises to quickly and accurately extract features from these
+data to perform tasks such as object recognition. For example, point cloud
+object recognition is especially relevant in autonomous vehicle research to
+detect other cars, pedestrians, road signs, etc. and inform real-time decisions.
+Classifying objects represented by 3D point clouds is therefore a highly
+relevant problem to solve. Furthermore, solutions for self-driving cars must run
+in real-time and thus must be highly performant.
+
+Our research proposes representing 3D point clouds as a series of
+two-dimensional, rasterized images generated from different perspectives. These
+images can then be joined into a single raster and fed into a one-shot detection
+network such as YOLO. This will maintain high efficiency while providing
+semi-redundant perspectives of the original point cloud.
+
+\subsection{Importance of the problem}
+Three-dimensional point clouds including those retrieved from LiDAR imaging
+systems are gaining popularity as the technology becomes more available. This is
+especially true in autonomous vehicle research which requires cars to detect
+pedestrians, other cars, road signs, etc. Classifying objects represented by 3D
+point clouds is therefore a relevant problem to solve.
+
+One of the challenges faced by autonomous vehicles is the high computation power
+requirements to achieve real-time operation. This adds significant cost to the
+car and its development infrastructure. Therefore, both accuracy and performance
+are essential to have a safe, reliable vehicle that responds in real-time.
+
+\section{Related Work}
+Present work is focused on classifying 3D point clouds directly from the raw
+data, not through 2D perspective rasters. Additionally, a substantial research
+has been performed to classify objects through 2D camera images. 
+
+This technique opens up the possibility of using any of the many existing image
+classification algorithms possibly leading to classification accuracy gains.
+
+Huang and You \cite{huang2016point} call out that a simple 2D representation of
+a point-cloud can lead to a loss in 3D structural representation. Here we hope
+to avoid this loss of information by adding additional rotation to the scene
+and detecting many instances at once.
+
+Landrieu and Simonovsky \cite{landrieu2018large} represent the state-of-the-art
+for point-cloud semantic segmentation. This paper uses a technique dubbed
+``superpoint graph'' which works in a similar way to superpixels; that is, by
+grouping neighboring similar clusters of points into larger objects which
+simplifies further processing by reducing the amount of data. In a similar way
+we hope to reduce the total amount of data by flattening the 3D space into a
+more consumable 2D representation.
+
+Substantial research has been performed in the space of 2D image object
+recognition. Early techniques included feature detectors such as SIFT and SURF
+which extracted invariant features from images and were then used to match to
+feed into a model such as a database of features or an SVM. Recently, deep
+learning has proven to be the de-facto standard for 2D image object
+classification. Techniques such as convolutional networks are often used. These
+have been shown to be both highly accurate and performant.
+
+Research has also been performed in the space of 3D point cloud feature
+recognition. Early research employed techniques such as surface reconstruction
+and feature extraction such as surface normals and gradients. Recent research
+has explored promising techniques such as directly ingesting 3D point clouds
+into deep neural networks using a voxelized structure. However this approach can
+be challenging to implement efficiently on hardware since 3D space is quite
+sparse and points can exist in continuous space rather than in a discrete grid
+like traditional images.
+
+\section{Related Work}
+We hope to improve current techniques by combining the rich 3D representation of
+objects using point clouds with the great efficiency of processing 2D images. By
+using a one-shot detection network such as YOLO, we can maintain high efficiency
+while adding semi-redundant rotated 2D perspectives of the point-clouds. We may
+also increase information density by encoding point depth information in a
+colour channel. For example, further pixels could be darker. We hope this shaded
+depth representation will achieve greater edge discrimination.
+
+As described below, we have chosen Sydney Urban Objects Dataset to evaluate our
+technique. Maturana and Scherer \cite{maturana2015voxnet} report an average F1
+classification score of 0.73 using a convolutional neural network. Furthermore,
+their methods takes ~6ms to classify a single object using a Tesla K40 GPU. We
+will investigate potential accuracy and performance gains using our perspective
+rasterization techniques coupled with a one-shot classifier.
+
+\section{Data Set}
+We have chosen the Sydney Urban Objects Dataset for our project due to its size
+and the variety of objects. As part of this project we may chose to augment this
+dataset by introducing small amounts of noise and distortion to the point-cloud.
+Figure \ref{data-example} shows sample point clouds from this data set.
+
+\begin{figure}[h]
+  \label{data-example}
+  \caption{Example objects in our chosen dataset}
+  \centering
+  \includegraphics[scale=0.1]{data-example}
+\end{figure}
+
+\section{Methodology}
+\subsection{Preprocessing}
+Our proposed technique involves the following pre-processing steps.
+\begin{enumerate}
+  \item Load the dataset into memory by parsing the raw data file.
+  \item Set the scene properties such as background color, point color, etc.
+  \item Determine the geometric centre of the point cloud.
+  \item Position the “camera” such that it is facing the centre of the point
+    cloud. Presently, the radius is manually determined and hard-coded such that
+    the entire point cloud is viewable by the camera. Future work could involve
+    automatically adjusting the radius such that the entire point cloud is fully
+    captured by the camera.
+  \item Move the camera around the center of the point cloud (maintaining the
+    same radius) to capture 64 perspectives of the point cloud.
+  \item At each iteration, take a “picture” and save it to as a temporary file
+    on the filesystem.
+  \item After all perspectives have been captured, stitch the images together in
+    a 8x8 grid.
+  \item Reduce the resolution so the image size is more reasonable.
+  \item Save the stitched image.
+  \item Generate a labels file with 64 bounding box coordinates, one around each
+    image in our grid.
+\end{enumerate}
+
+To move the camera around the image, we translate the camera’s position from
+cartesian to polar coordinates as described in Equations
+\ref{polar-coordinates:r}-\ref{polar-coordinates:phi} and visualized in Figure
+\ref{polar-coordinates}.
+Additionally, we ensure that the camera is “pointing” at the origin.
+
+\begin{align}
+  \label{polar-coordinates:r}
+  r &= \sqrt{x^2 + y^2 + z^2} \\
+  \label{polar-coordinates:theta}
+  \theta &= \tan\left(\frac{y}{x}\right) \\
+  \label{polar-coordinates:phi}
+  \phi &= \cos\left(\frac{z}{r}\right)
+\end{align}
+
+\begin{figure}[h]
+  \label{polar-coordinates}
+  \caption{Example objects in our chosen dataset}
+  \centering
+  \includegraphics[scale=0.15]{polar-coordinates}
+\end{figure}
+
+An example result of a car’s point cloud after preprocessing is shown in Figure
+\ref{example-preprocessing}. Note that we have inverted the colours for greater
+visibility when printed.
+
+\begin{figure}[h]
+  \label{example-preprocessing}
+  \caption{Example objects in our chosen dataset}
+  \centering
+  \includegraphics[scale=0.15]{example-preprocessing-car}
+\end{figure}
+
+\subsection{Challenges}
+We encountered a major difficulty working with pptk. The client Python library
+communicates with a C++ backend via a socket. However, no effort is made to
+synchronize the communication or signal when the socket communication is
+complete. Therefore, after a considerable amount of debugging, we discovered
+that we must sleep ~0.2 seconds between rendering and capturing the image to
+save to the filesystem. This makes the data rendering process extremely slow.
+Generating our perspective grid rasters for ~300 point clouds is estimated to
+take over 70 hours due to this delay. Our current efforts are focused towards
+parallelizing the rendering to speed up the process. This will likely involve
+using multiple processes (not threads) to parallelize the execution. Hopefully
+pptk is robust in the face of this parallelization.
+
+\subsection{Training}
+Type something clever\dots
+
+\begin{figure}[h]
+  \label{training-200}
+  \caption{Training with dataset of 200 images (70/30 training/testing split)}
+  \centering
+  \includegraphics[scale=0.15]{training-200}
+\end{figure}
+
+\begin{figure}[h]
+  \label{training-600}
+  \caption{Training with dataset of 600 images (70/30 training/testing split)}
+  \centering
+  \includegraphics[scale=0.15]{training-600}
+\end{figure}
+
+\begin{figure}[h]
+  \label{accuracy-vs-threshold}
+  \caption{Accuracy vs Threshold}
+  \centering
+  \includegraphics[scale=0.15]{accuracy-vs-threshold}
+\end{figure}
+
+\begin{figure}[h]
+  \label{example-failure}
+  \caption{Example detection failure: building classified as a car}
+  \centering
+  \includegraphics[scale=0.15]{example-failure}
+\end{figure}
+
+\subsection{Inference}
+Type something clever\dots
+
+\subsection{Future Work}
+\subsubsection{Tighter Bounding Box}
+We presently draw the the image label bounding box around the entire perspective
+raster which includes a considerable amount of “empty” space (i.e. black
+background). We might see better classification results with a tighter bounding
+box around each image. Using OpenCV looks like a promising library to achieve this.
+
+\subsubsection{Encode Additional Information Through Colour}
+Right now each point in the point cloud is a single, white dot. We might see
+accuracy improvements encoding additional information into the colour of each
+point. For example, depth information such as distance from the camera could be
+encoded into one colour channel, curvature into another channel, etc.
+
+\subsubsection{Scale Robustness with Multiple Radii}
+All perspective rasters are presently captured using a single, fixed radius
+from the geometric center of the point cloud. Also varying the radius of the
+camera from the point cloud’s center might make our classifier more robust to
+scale. 
+
+\section{Results}
+\subsection{Accuracy}
+Type something clever\dots
+
+\subsection{Accuracy vs Threshold}
+Type something clever\dots
+
+\subsection{Evaluation}
+Type something clever\dots
+
+\subsection{Comparison with Existing Methods}
+Type something clever\dots
+
+\section{Discussion and Conclusion}
+Type something clever\dots
+
+\bibliography{report}
+\bibliographystyle{ieeetr}
+
+\end{document}
