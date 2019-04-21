@@ -46,11 +46,11 @@ Classifying objects represented by 3D point clouds is therefore a highly
 relevant problem to solve. Furthermore, solutions for self-driving cars must run
 in real-time and thus must be highly performant.
 
-Our research proposes representing 3D point clouds as a series of
-two-dimensional, rasterized images generated from different perspectives. These
-images can then be joined into a single raster and fed into a one-shot detection
-network such as YOLO. This will maintain high efficiency while providing
-semi-redundant perspectives of the original point cloud.
+Our research proposes representing 3D point clouds as a series of 2D rasterized
+images generated from different perspectives. These images can then be joined
+into a single raster and fed into a one-shot detection network such as YOLO.
+This will maintain high efficiency while providing semi-redundant perspectives
+of the original point cloud.
 
 \subsection{Importance of the problem}
 Three-dimensional point clouds including those retrieved from LiDAR imaging
@@ -102,7 +102,7 @@ be challenging to implement efficiently on hardware since 3D space is quite
 sparse and points can exist in continuous space rather than in a discrete grid
 like traditional images.
 
-\section{Related Work}
+\section{Novelty}
 We hope to improve current techniques by combining the rich 3D representation of
 objects using point clouds with the great efficiency of processing 2D images. By
 using a one-shot detection network such as YOLO, we can maintain high efficiency
@@ -122,13 +122,13 @@ rasterization techniques coupled with a one-shot classifier.
 We have chosen the Sydney Urban Objects Dataset for our project due to its size
 and the variety of objects. As part of this project we may chose to augment this
 dataset by introducing small amounts of noise and distortion to the point-cloud.
-Figure \ref{data-example} shows sample point clouds from this data set.
+Figure \ref{fig:data-example} shows sample point clouds from this data set.
 
 \begin{figure}[h]
-  \label{data-example}
   \caption{Example objects in our chosen dataset}
   \centering
   \includegraphics[scale=0.1]{data-example}
+  \label{fig:data-example}
 \end{figure}
 
 \section{Methodology}
@@ -158,7 +158,7 @@ Our proposed technique involves the following pre-processing steps.
 To move the camera around the image, we translate the camera’s position from
 cartesian to polar coordinates as described in Equations
 \ref{polar-coordinates:r}-\ref{polar-coordinates:phi} and visualized in Figure
-\ref{polar-coordinates}.
+\ref{fig:polar-coordinates}.
 Additionally, we ensure that the camera is “pointing” at the origin.
 
 \begin{align}
@@ -171,21 +171,21 @@ Additionally, we ensure that the camera is “pointing” at the origin.
 \end{align}
 
 \begin{figure}[h]
-  \label{polar-coordinates}
   \caption{Example objects in our chosen dataset}
   \centering
   \includegraphics[scale=0.15]{polar-coordinates}
+  \label{fig:polar-coordinates}
 \end{figure}
 
 An example result of a car’s point cloud after preprocessing is shown in Figure
-\ref{example-preprocessing}. Note that we have inverted the colours for greater
+\ref{fig:example-preprocessing}. Note that we have inverted the colours for greater
 visibility when printed.
 
 \begin{figure}[h]
-  \label{example-preprocessing}
   \caption{Example objects in our chosen dataset}
   \centering
   \includegraphics[scale=0.15]{example-preprocessing-car}
+  \label{fig:example-preprocessing}
 \end{figure}
 
 \subsection{Challenges}
@@ -205,31 +205,31 @@ pptk is robust in the face of this parallelization.
 Type something clever\dots
 
 \begin{figure}[h]
-  \label{training-200}
   \caption{Training with dataset of 200 images (70/30 training/testing split)}
   \centering
   \includegraphics[scale=0.15]{training-200}
+  \label{fig:training-200}
 \end{figure}
 
 \begin{figure}[h]
-  \label{training-600}
   \caption{Training with dataset of 600 images (70/30 training/testing split)}
   \centering
   \includegraphics[scale=0.15]{training-600}
+  \label{fig:training-600}
 \end{figure}
 
 \begin{figure}[h]
-  \label{accuracy-vs-threshold}
   \caption{Accuracy vs Threshold}
   \centering
   \includegraphics[scale=0.15]{accuracy-vs-threshold}
+  \label{fig:accuracy-vs-threshold}
 \end{figure}
 
 \begin{figure}[h]
-  \label{example-failure}
   \caption{Example detection failure: building classified as a car}
   \centering
   \includegraphics[scale=0.15]{example-failure}
+  \label{fig:example-failure}
 \end{figure}
 
 \subsection{Inference}
@@ -240,7 +240,8 @@ Type something clever\dots
 We presently draw the the image label bounding box around the entire perspective
 raster which includes a considerable amount of “empty” space (i.e. black
 background). We might see better classification results with a tighter bounding
-box around each image. Using OpenCV looks like a promising library to achieve this.
+box around each image. Using OpenCV looks like a promising library to achieve
+this.
 
 \subsubsection{Encode Additional Information Through Colour}
 Right now each point in the point cloud is a single, white dot. We might see
