@@ -171,7 +171,7 @@ Additionally, we ensure that the camera is “pointing” at the origin.
 \end{align}
 
 \begin{figure}[h]
-  \caption{Example objects in our chosen dataset}
+  \caption{Polar and cartesian coordinates}
   \centering
   \includegraphics[scale=0.15]{polar-coordinates}
   \label{fig:polar-coordinates}
@@ -195,11 +195,6 @@ synchronize the communication or signal when the socket communication is
 complete. Therefore, after a considerable amount of debugging, we discovered
 that we must sleep ~0.2 seconds between rendering and capturing the image to
 save to the filesystem. This makes the data rendering process extremely slow.
-Generating our perspective grid rasters for ~300 point clouds is estimated to
-take over 70 hours due to this delay. Our current efforts are focused towards
-parallelizing the rendering to speed up the process. This will likely involve
-using multiple processes (not threads) to parallelize the execution. Hopefully
-pptk is robust in the face of this parallelization.
 
 \subsection{Training}
 Type something clever\dots
