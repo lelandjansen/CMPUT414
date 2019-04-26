@@ -1,7 +1,6 @@
 # CMPUT414
 CMPUT 414 course (Winter 2019) Team Hawaii - Leland Jansen and Nathan Liebrecht
 
-
 # Reproducing results
 
 Our project is grouped into 3 broad steps:
@@ -48,18 +47,20 @@ You should now have a file structure similar to the provided `data.zip` file.
 
 ## 2. Train the YOLO CNN
 
-To skip this step you may just copy over the `yolov3-414_final.weights` found in the drive link.
+To skip this step you may just copy over the `yolov3-414_final.weights` found in the drive link
+into `src/darknet/build/darknet/x64`.
 
 To train from scratch:
 
 1. Change to the directory with the darknet binary (`src/darknet/build/darknet/x64`)
 2. Download the starting weights https://pjreddie.com/media/files/darknet53.conv.74
 3. Run `darknet detector train data/414.data data/yolov3-414.cfg darknet53.conv.74 -map`
+4. Move `src/darknet/build/darknet/x64/backup/yolov3-414_final.weights` up a directory.
 
 
 ## 3. Testing inference
 
-1. Copy `infer.py` into `src/darknet/build/darknet/x64`.
+1. Copy `src/infer.py` into `src/darknet/build/darknet/x64`.
 2. Run `infer.py`
 
 
