@@ -32,10 +32,11 @@ and code repository can be found here: https://github.com/AlexeyAB/darknet#how-t
 To skip this step, simply extract the data.zip folder into the `src/darknet/build/darknet/x64` folder
 created in the "Pre-requisits" section.
 
-1. To rasterize the Sydney dataset (included in the data folder) 
-   into the 64x64 tiles run `visualize.py`. 
+To re-rasterize the Sydney dataset included in the data folder into the 64x64 tiles
+1. Create an `out` folder in the root of the repository
+1. Run `visualize.py`. 
    Data will be output in the `out` folder. This will take around 4 hours.
-   Once this is complete, copy these files into a new folder: 
+   Once this is complete, copy the files in `out` into a new folder: 
    `src/darknet/build/darknet/x64/data/414`
 2. Run `split_dataset.py` to regenerate the data split. Copy `test.txt` and `train.txt`
    into the `src/darknet/build/darknet/x64/data` folder.
