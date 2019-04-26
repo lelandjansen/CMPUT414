@@ -316,16 +316,16 @@ score of 0.77. Since the Sydney dataset is quite limited by the standards of tod
 deep learning needs, we expect that more data would greatly increase the performance of
 our method.
 
-In terms of run-time, previous papers are more effecient, however this comes at
-the expense of accuracy.
+In terms of run-time, previous papers are more effecient (6ms vs our 10ms per image), 
+however this comes at the expense of accuracy.
 
 
 \section{Conclusion}
 In conclusion, we are able to effectively classify vehicle and pedestrain point-clouds in the 
 Sydney Urban Objects Dataset by taking advantage of recent breakthroughs in 2D image
-detection technologies. By rasterizing multiple 2D perspectives of the point-clouds and
-introducing a voting mechanism to resolve multiple detections we are able to preserve
-depth information which reducing the effective dimensionality of our input.
+detection technologies. By rasterizing multiple 2D perspectives for the point-clouds and
+introducing a voting mechanism for object classification, we are able to preserve depth 
+information and increase accuracy while also maintaining efficiency.
 
 \bibliography{report}
 \bibliographystyle{ieeetr}
