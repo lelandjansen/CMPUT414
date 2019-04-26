@@ -61,7 +61,8 @@ To train from scratch:
 
 ## 3. Testing inference
 
-1. Copy `src/infer.py` into `src/darknet/build/darknet/x64`.
+1. Copy `src/infer.py` into `src/darknet/build/darknet/x64`. This file should be in the same
+   folder as `darknet.py` and the dynamic darknet library (`libdarknet.so` on Linux)
 2. Run `infer.py`
 
 

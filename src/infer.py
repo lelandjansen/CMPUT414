@@ -5,16 +5,21 @@ from collections import Counter
 from sklearn.metrics import precision_recall_fscore_support, classification_report
 import time
 
+VOTING_THRESHOLD = 58
+DEBUG = False
+
+
+# fine the test images
 with open("data/test.txt") as f:
     data = f.readlines()
 data = [x.strip() for x in data] 
 
 
-threshold = 58
-
+# Count the number of right and wrong classifications and
+# also record our ground truth and infered classes so that
+# we can perform analysis on the data later.
 right = 0
 wrong = 0
-
 y_true = []
 y_pred = []
 t0 = time.time()
@@ -30,12 +35,12 @@ for image in data:
     cnt = Counter([x[0] for x in res])
     detections = sorted(list(cnt.items()), key=lambda x: x[1], reverse=True)
     classification = 'none';
-    if len(detections) > 0 and detections[0][1] >= threshold:
+    if len(detections) > 0 and detections[0][1] >= VOTING_THRESHOLD:
             classification = detections[0][0]		
 
-    print('class:', classification)
+    if DEBUG: print('class:', classification)
 
-    # verify
+    # Verify whether the class is correct
     actual_class = 'none'
     labels = ".".join(image.split('.')[:-1])+".txt"
     with open(labels) as f:
@@ -46,15 +51,15 @@ for image in data:
             else: actual_class = 'pedestrian'
 
     if actual_class != classification:
-            print("wrong!!!!!!!!!!!!!!!!", image, detections[0][1], actual_class)
+            if DEBUG: print("wrong!!!!!!!!!!!!!!!!", image, detections[0][1], actual_class)
             wrong += 1
     else:
             right += 1
     
     y_true.append(actual_class)
     y_pred.append(classification)
-                        
+
+accuracy = (100*right/(right+wrong))
 print("t_avg = {}ms".format(time.time()-t0))
-percent = (100*right/(right+wrong))
-print('right:', right, 'wrong:', wrong, "accuracy: %.3f%%" % percent)
+print('right:', right, 'wrong:', wrong, "accuracy: %.3f%%" % accuracy)
 print(classification_report(y_true, y_pred, target_names=['car', 'pedestrian', 'none'], digits=4))
