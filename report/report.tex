@@ -31,7 +31,9 @@ image classification techniques to classify the rasters. Existing work has had
 limited success using this technique with only one perspective, likely due to
 the considerable information loss during the projection. We hypothesize that
 multiple projections will mitigate these effects by capturing lost data in other
-perspective projections.
+perspective projections. Our method proves to be effective when
+classifying pedestrians and vehicles in the Sydney Urban Objects Dataset, where
+our technique has achieved a classification accuracy of 98.42\% and an f1 score of 0.9843.
 \end{abstract}
 
 \section{Introduction}
@@ -113,9 +115,9 @@ depth representation will achieve greater edge discrimination.
 
 As described below, we have chosen Sydney Urban Objects Dataset to evaluate our
 technique. Maturana and Scherer \cite{maturana2015voxnet} report an average F1
-classification score of 0.73 using a convolutional neural network. Furthermore,
-their methods takes ~6ms to classify a single object using a Tesla K40 GPU. We
-will investigate potential accuracy and performance gains using our perspective
+classification score of 0.73 using a convolutional neural network. Their methods 
+also take around 6ms to classify an object using a Tesla K40 GPU. We
+will investigate potential accuracy and performance differences using our perspective
 rasterization techniques coupled with a one-shot classifier.
 
 \section{Data Set}
@@ -197,38 +199,28 @@ that we must sleep ~0.2 seconds between rendering and capturing the image to
 save to the filesystem. This makes the data rendering process extremely slow.
 
 \subsection{Training}
-Type something clever\dots
+We train our preprocessed images on the YOLOv3 network \cite{redmon2016you} which 
+has an excellent reputation for high performance and accurate object detection. 
+Simply, we add 64 bounding boxes, one for each perspective, and feed this ground 
+truth data to the YOLOv3 network. Figure \ref{fig:training-600} shows the progression
+of training on a 1080 Ti GPU over the span of around 6 hours.
 
 \begin{figure}[h]
-  \caption{Training with dataset of 200 images (70/30 training/testing split)}
-  \centering
-  \includegraphics[scale=0.15]{training-200}
-  \label{fig:training-200}
-\end{figure}
-
-\begin{figure}[h]
-  \caption{Training with dataset of 600 images (70/30 training/testing split)}
+  \caption{Training with dataset of 630 images (70/30 training/testing split)}
   \centering
   \includegraphics[scale=0.15]{training-600}
   \label{fig:training-600}
 \end{figure}
 
-\begin{figure}[h]
-  \caption{Accuracy vs Threshold}
-  \centering
-  \includegraphics[scale=0.15]{accuracy-vs-threshold}
-  \label{fig:accuracy-vs-threshold}
-\end{figure}
-
-\begin{figure}[h]
-  \caption{Example detection failure: building classified as a car}
-  \centering
-  \includegraphics[scale=0.15]{example-failure}
-  \label{fig:example-failure}
-\end{figure}
-
 \subsection{Inference}
-Type something clever\dots
+Once we have preprocessed the point cloud and arranged it into an image grid, we
+then perform inference on this image using the YOLOv3 network. The result of this
+inference step is a list of classes and bounding boxes. To make sense of these
+detections, we first sort the list of detected classes. We then count the number
+of detections for the most detected class and apply a configurable threshold
+to this number. If the number of detections equals or exceeds the given threshold,
+we consider this class to be the final classification. Using this voting
+mechanism we are able to add redundancy through multiple perspectives.
 
 \subsection{Future Work}
 \subsubsection{Tighter Bounding Box}
@@ -251,20 +243,89 @@ camera from the point cloud’s center might make our classifier more robust to
 scale. 
 
 \section{Results}
+
+\begin{figure}[h]
+  \caption{Example detection failure: building classified as a car}
+  \centering
+  \includegraphics[scale=0.15]{example-failure}
+  \label{fig:example-failure}
+\end{figure}
+
 \subsection{Accuracy}
-Type something clever\dots
+As seen in the ``Training" section, the mAP is around 0.70 which is rather low. 
+However by using our voting mechanism we are able to acheive a far greater aggregate
+result. For the Sydney testing dataset the highest accuracy we have achieved is 98.42\%.
 
 \subsection{Accuracy vs Threshold}
-Type something clever\dots
+As mentioned in the ``Inference" section, an important parameter to tune is the threshold
+of detections at which we consider the object to be classified. We perform an empirical
+study to guage the most effective value and find that the optimal value for us is 58.
+Figure \ref{fig:accuracy-vs-threshold} shows the relation between the threshold value
+and our accuracy.
+
+
+\begin{figure}[h]
+  \caption{Accuracy vs Threshold}
+  \centering
+  \includegraphics[scale=0.15]{accuracy-vs-threshold}
+  \label{fig:accuracy-vs-threshold}
+\end{figure}
+
 
 \subsection{Evaluation}
-Type something clever\dots
+We perform a standard classfication evaluation which consists of finding the precision,
+recall, and f1 values for each class, and the weighted average of these values over each
+class. Our results are shown in the following table: 
+
+\begin{center}
+\begin{tabular}{ |c|c|c|c|c|c| } 
+\hline
+	    & & precision & recall & f1-score & support \\
+\hline
+\multirow{3}{4em}{Class} & car & 0.9839 & 1.0000 & 0.9919 & 61  \\
+  		  & pedestrian & 1.0000 & 0.9688 & 0.9841 & 96  \\
+      		      & none & 0.9429 & 1.0000 & 0.9706 & 33  \\
+\hline
+\multirow{3}{4em}{Average}  & micro avg & 0.9842 & 0.9842 & 0.9842 & 190 \\
+   			    & macro avg & 0.9756 & 0.9896 & 0.9822 & 190 \\
+			 & weighted avg & 0.9849 & 0.9842 & 0.9843 & 190 \\
+
+ \hline
+\end{tabular}
+\end{center}
+
+In order to evaluate the run-time of our system, we simply take the total runtime of the inference
+step and divide by the number of images. Using a 1080 Ti we are able to get 
+inference times of approximately 10 milliseconds per object. Because an 
+optimized preprocessing step (rasterization of simple points) would be 
+almost immediate using modern graphics acceleration hardware, we can assume 
+that the majority of the time will be spent in the inference step and that 
+this time meaured is a good estimate of the end-to-end time spent from lidar 
+point-cloud to classification.
 
 \subsection{Comparison with Existing Methods}
-Type something clever\dots
+We found two papers that attempt to classify the point cloud data in our chosen dataset.
+In De Deuge et al. Unsupervised Feature Learning for Classification of Outdoor 3D Scans
+\cite{de2013unsupervised},
+they acheive a maximum f1 score of 0.671. In Quadros, Representing 3D shape in sparse 
+range images for urban object classification \cite{quadros2013representing}, they were 
+able to attain an f1 score of 0.7. The average f1 score of 0.9843 that we attained 
+indicates a significantly higher performance than these contemporaries. In particular,
+we have much better f1 score in vehicle classification where Quadros, 2014 achieves an f1
+score of 0.77. Since the Sydney dataset is quite limited by the standards of today's
+deep learning needs, we expect that more data would greatly increase the performance of
+our method.
 
-\section{Discussion and Conclusion}
-Type something clever\dots
+In terms of run-time, previous papers are more effecient, however this comes at
+the expense of accuracy.
+
+
+\section{Conclusion}
+In conclusion, we are able to effectively classify vehicle and pedestrain point-clouds in the 
+Sydney Urban Objects Dataset by taking advantage of recent breakthroughs in 2D image
+detection technologies. By rasterizing multiple 2D perspectives of the point-clouds and
+introducing a voting mechanism to resolve multiple detections we are able to preserve
+depth information which reducing the effective dimensionality of our input.
 
 \bibliography{report}
 \bibliographystyle{ieeetr}
