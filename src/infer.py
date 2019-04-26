@@ -9,13 +9,13 @@ VOTING_THRESHOLD = 58
 DEBUG = False
 
 
-# fine the test images
+# find the test images
 with open("data/test.txt") as f:
     data = f.readlines()
 data = [x.strip() for x in data] 
 
 
-# Count the number of right and wrong classifications and
+# count the number of right and wrong classifications and
 # also record our ground truth and infered classes so that
 # we can perform analysis on the data later.
 right = 0
@@ -40,7 +40,7 @@ for image in data:
 
     if DEBUG: print('class:', classification)
 
-    # Verify whether the class is correct
+    # verify whether the class is correct
     actual_class = 'none'
     labels = ".".join(image.split('.')[:-1])+".txt"
     with open(labels) as f:
@@ -63,3 +63,5 @@ accuracy = (100*right/(right+wrong))
 print("t_avg = {}ms".format(time.time()-t0))
 print('right:', right, 'wrong:', wrong, "accuracy: %.3f%%" % accuracy)
 print(classification_report(y_true, y_pred, target_names=['car', 'pedestrian', 'none'], digits=4))
+
+
