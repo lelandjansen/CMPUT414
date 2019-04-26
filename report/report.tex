@@ -254,7 +254,8 @@ scale.
 \subsection{Accuracy}
 As seen in the ``Training" section, the mAP is around 0.70 which is rather low. 
 However by using our voting mechanism we are able to acheive a far greater aggregate
-result. For the Sydney testing dataset the highest accuracy we have achieved is 98.42\%.
+result. With this voting technique we have achieved a classification accuracy of 98.42\% on 
+the Sydney Urban Objects dataset.
 
 \subsection{Accuracy vs Threshold}
 As mentioned in the ``Inference" section, an important parameter to tune is the threshold
@@ -294,7 +295,7 @@ class. Our results are shown in the following table:
 \end{tabular}
 \end{center}
 
-In order to evaluate the run-time of our system, we simply take the total runtime of the inference
+In order to evaluate the runtime of our system, we simply take the total runtime of the inference
 step and divide by the number of images. Using a 1080 Ti we are able to get 
 inference times of approximately 10 milliseconds per object. Because an 
 optimized preprocessing step (rasterization of simple points) would be 
@@ -312,11 +313,11 @@ range images for urban object classification \cite{quadros2013representing}, the
 able to attain an f1 score of 0.7. The average f1 score of 0.9843 that we attained 
 indicates a significantly higher performance than these contemporaries. In particular,
 we have much better f1 score in vehicle classification where Quadros, 2014 achieves an f1
-score of 0.77. Since the Sydney dataset is quite limited by the standards of today's
-deep learning needs, we expect that more data would greatly increase the performance of
-our method.
+score of 0.77. Since the Sydney dataset is quite small and deep learning techniques
+thrive on abundant data, we expect that a richer dataset would greatly increase the 
+accuracy of our model.
 
-In terms of run-time, previous papers are more effecient (6ms vs our 10ms per image), 
+In terms of runtime, previous papers are more effecient (6ms vs our 10ms per image), 
 however this comes at the expense of accuracy.
 
 
