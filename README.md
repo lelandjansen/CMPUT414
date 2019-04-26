@@ -33,14 +33,18 @@ To skip this step, simply extract the data.zip folder into the `src/darknet/buil
 created in the "Pre-requisits" section.
 
 To re-rasterize the Sydney dataset included in the data folder into the 64x64 tiles
-1. Create an `out` folder in the root of the repository
-1. Run `visualize.py`. 
+
+1. Download the Sydney Urban Objects Dataset and extract the data into 
+   the `data/sydney-urban-objects-dataset/` folder. The dataset can be found here:
+   http://www.acfr.usyd.edu.au/papers/SydneyUrbanObjectsDataset.shtml
+2. Create an `out` folder in the root of the repository
+3. Run `visualize.py`. 
    Data will be output in the `out` folder. This will take around 4 hours.
    Once this is complete, copy the files in `out` into a new folder: 
    `src/darknet/build/darknet/x64/data/414`
-2. Run `split_dataset.py` to regenerate the data split. Copy `test.txt` and `train.txt`
+4. Run `split_dataset.py` to regenerate the data split. Copy `test.txt` and `train.txt`
    into the `src/darknet/build/darknet/x64/data` folder.
-3. Copy the remaining configuration files into the data folder from the `data.zip` file.
+5. Copy the remaining configuration files into the data folder from the `data.zip` file.
    These are fixed configuration files that remain constant
 
 You should now have a file structure similar to the provided `data.zip` file.
